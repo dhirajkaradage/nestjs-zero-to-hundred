@@ -37,22 +37,19 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string) {
-    // const user = this.users.find((obj) => obj.id === +id);
-    // if (!user) {
-    //   throw new HttpException('No user found', 412);
-    // }
-    // return user;
-    return this.userService.getUserById(+id);
+  async getUserById(@Param('id') id: string) {
+    return await this.userService.getUserById(+id);
   }
 
   @Post('/create')
-  createUser(@Res() res: Response, @Body() userDTO: UserDTO) {
+  async createUser(@Res() res: Response, @Body() userDTO: UserDTO) {
     // const newId = this.users[this.users.length - 1].id;
     // userDTO['id'] = newId + 1;
     // this.users.push(userDTO);
     // return this.users;
-    const newUser = this.userService.createUser(userDTO).then((res) => res);
+    const newUser = await this.userService
+      .createUser(userDTO)
+      .then((res) => res);
     console.log('thsi is use ', newUser);
 
     return res.status(201).json({
@@ -62,7 +59,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  updateUser(@Param('id') id: string, @Body() userDto: UserDTO) {
+  async updateUser(@Param('id') id: string, @Body() userDto: UserDTO) {
     // const dbUser = this.users.find((obj) => obj.id === +id);
     // if (!dbUser) throw new HttpException('No User Found', 412);
     // const dbUserIndex = this.users.findIndex((obj) => obj.id === +id);
@@ -74,11 +71,11 @@ export class UsersController {
     // this.users[dbUserIndex] = dbUser;
     // return this.users;
 
-    return this.userService.updateUser(+id, userDto);
+    return await this.userService.updateUser(+id, userDto);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id') id: string) {
     // const userToDeleteIndex = this.users.findIndex((obj) => obj.id === +id);
     // console.log('this is user index ', userToDeleteIndex, +id);
 
@@ -86,6 +83,6 @@ export class UsersController {
     // this.users.splice(userToDeleteIndex, 1);
     // return this.users;
 
-    return this.userService.deleteUser(+id);
+    return await this.userService.deleteUser(+id);
   }
 }
