@@ -21,7 +21,7 @@ export class User {
   @Column()
   password: string;
 
-  @OneToOne(() => Address) // to connect this table to the address table
+  @OneToOne(() => Address, { cascade: true, onDelete: 'CASCADE' }) // to connect this table to the address table
   @JoinColumn() // to addressId column in user table
   address: Address;
 }

@@ -41,21 +41,70 @@ export class UsersService {
 
   async updateUser(id: number, userDto: UserDTO) {
     // const dbUser = this.users.find((obj) => obj.id === id);
-    const dbUser = await this.userRepository.findOne({ where: { id: id } });
+    const dbUser = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['address'],
+    });
     if (!dbUser) throw new HttpException('No User Found', 412);
+    // dbUser['email'] = userDto.email;
+    // dbUser['name'] = userDto.name;
+    // dbUser['password'] = userDto.password;
+
+    // const updatedUser = await this.userRepository.save(dbUser);
+    console.log('thsi is user ', dbUser);
     dbUser['email'] = userDto.email;
     dbUser['name'] = userDto.name;
     dbUser['password'] = userDto.password;
+    let address: Address;
+    if (!dbUser.address && userDto.address) {
+      address = await this.addressRepo.save(userDto.address);
+      dbUser.address = address;
+    } else {
+      dbUser.address.city = userDto.address.city;
+      dbUser.address.pincode = userDto.address.pincode;
+      dbUser.address.country = userDto.address.country;
+      dbUser.address.state = userDto.address.state;
+      dbUser.address.address = userDto.address.address;
+    }
 
-    const updatedUser = await this.userRepository.save(dbUser);
-    return updatedUser;
+    return await this.userRepository.save(dbUser);
   }
 
   async deleteUser(id: number) {
     // const userToDeleteIndex = this.users.findIndex((obj) => obj.id === id);
-    const userToDeleteIndex = await this.userRepository.delete(id);
     // if (userToDeleteIndex == -1) throw new HttpException('User no found', 412);
     // this.users.splice(userToDeleteIndex, 1);
-    return userToDeleteIndex;
+
+    // one way
+    // const user = await this.userRepository.findOne({
+    //   where: { id: id },
+    //   relations: ['address'],
+    // });
+
+    // console.log('this is user ', user);
+
+    // if (user.address) {
+    //   await this.userRepository.update(user.id, { address: null });
+
+    //   const deletedAddress = await this.addressRepo.delete(user.address.id);
+    //   console.log('this is deleted address res ', deletedAddress);
+    // }
+
+    // const userToDeleteIndex = await this.userRepository.delete(id);
+    // return userToDeleteIndex.affected;
+
+    // 2nd way use cascade in the user entity for address
+
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['address'],
+    });
+
+    if (user.address) {
+      const deletedAddress = await this.addressRepo.delete(user.address.id);
+      console.log('this is deleted address res ', deletedAddress);
+    }
+
+    return await this.userRepository.delete(id);
   }
 }
