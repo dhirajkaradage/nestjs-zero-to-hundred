@@ -14,26 +14,12 @@ import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
-  users: UserDTO[] = [
-    {
-      id: 1,
-      email: 'dhiraj@gmail.com',
-      name: 'Dhiraj Dk',
-      password: 'DhirajDk',
-    },
-    {
-      id: 2,
-      email: 'ketan@gmail.com',
-      name: 'Ketan Sutar',
-      password: 'k10sutar',
-    },
-  ];
   constructor(private userService: UsersService) {}
 
   @Get('')
-  getAllUsers() {
+  async getAllUsers() {
     // return this.users;
-    return this.userService.getAllUsers();
+    return await this.userService.getAllUsers();
   }
 
   @Get(':id')

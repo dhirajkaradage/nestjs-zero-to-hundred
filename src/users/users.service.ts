@@ -3,35 +3,25 @@ import { UserDTO } from './userDto/user-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import { Address } from 'src/address/entities/address.entity';
 
 @Injectable()
 export class UsersService {
-  users: UserDTO[] = [
-    {
-      id: 1,
-      email: 'dhiraj@gmail.com',
-      name: 'Dhiraj Dk',
-      password: 'DhirajDk',
-    },
-    {
-      id: 2,
-      email: 'ketan@gmail.com',
-      name: 'Ketan Sutar',
-      password: 'k10sutar',
-    },
-  ];
-
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Address) private addressRepo: Repository<Address>,
   ) {}
 
-  getAllUsers(): Promise<UserDTO[]> {
-    return this.userRepository.find();
+  async getAllUsers(): Promise<UserDTO[]> {
+    return await this.userRepository.find({ relations: ['address'] });
   }
 
   async getUserById(id: number): Promise<UserDTO> {
     // const user = this.users.find((obj) => obj.id === +id);
-    const user = await this.userRepository.findOne({ where: { id: id } });
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+      relations: ['address'],
+    });
     console.log('thsi is user ', user);
     if (!user) {
       throw new HttpException('No user found', 412);
@@ -44,6 +34,8 @@ export class UsersService {
     // userDTO['id'] = newId + 1;
     // this.users.push(userDTO);
     // return this.users[this.users.length - 1];
+    const savedAddress = await this.addressRepo.save(userDTO.address);
+    userDTO.address = savedAddress;
     return await this.userRepository.save(userDTO);
   }
 
