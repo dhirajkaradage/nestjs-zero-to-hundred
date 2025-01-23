@@ -7,6 +7,7 @@ import { User } from './users/user.entity';
 import { PostsModule } from './posts/posts.module';
 import { AddressModule } from './address/address.module';
 import { Address } from './address/entities/address.entity';
+import { Post } from './posts/entities/post.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { Address } from './address/entities/address.entity';
       username: 'root',
       password: 'Root@123',
       database: 'nestjs',
-      entities: [User, Address],
+      entities: [User, Address, Post],
       synchronize: true,
     }),
     PostsModule,

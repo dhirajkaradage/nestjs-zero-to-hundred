@@ -1,8 +1,10 @@
 import { Address } from 'src/address/entities/address.entity';
+import { Post } from 'src/posts/entities/post.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -24,4 +26,10 @@ export class User {
   @OneToOne(() => Address, { cascade: true, onDelete: 'CASCADE' }) // to connect this table to the address table
   @JoinColumn() // to addressId column in user table
   address: Address;
+
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  posts: Post[];
 }
