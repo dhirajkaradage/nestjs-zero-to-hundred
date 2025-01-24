@@ -13,7 +13,7 @@ export class UsersService {
   ) {}
 
   async getAllUsers(): Promise<UserDTO[]> {
-    return await this.userRepository.find({ relations: ['address'] });
+    return await this.userRepository.find({ relations: ['address', 'posts'] });
   }
 
   async getUserById(id: number): Promise<UserDTO> {
