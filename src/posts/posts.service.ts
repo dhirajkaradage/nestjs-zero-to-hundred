@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
+import { UpdatePostDto } from './dto/update-post.dto';
 // import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
@@ -12,8 +13,8 @@ export class PostsService {
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Post) private postService: Repository<Post>,
   ) {}
+
   async create(createPostDto: CreatePostDto): Promise<CreatePostDto> {
-    console.log('this is createPostDto, ', createPostDto);
     const user = await this.userRepo.findOne({
       where: { id: createPostDto.userId },
     });
@@ -30,15 +31,25 @@ export class PostsService {
     return await this.postService.find({ relations: ['user'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: number) {
+    return await this.postService.findOne({
+      where: { id: id },
+      relations: ['user'],
+    });
   }
 
-  // update(id: number, updatePostDto: UpdatePostDto) {
-  //   return `This action updates a #${id} post`;
-  // }
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
+    const address: Post = await this.postService.findOne({ where: { id: id } });
+    if (!address) {
+      throw new HttpException('No address found', 412);
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+    address.title = updatePostDto.title;
+    address.content = updatePostDto.content;
+    return await this.postService.save(address);
+  }
+
+  async remove(id: number) {
+    return await this.postService.delete(id);
   }
 }
