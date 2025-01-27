@@ -9,18 +9,32 @@ import {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const extractValidationErrors = (errors: ValidationError[]): string[] => {
+    const messages: string[] = [];
+    for (const error of errors) {
+      if (error.constraints) {
+        messages.push(
+          `${error.property} - ${Object.values(error.constraints).join(', ')}`,
+        );
+      }
+      if (error.children?.length) {
+        messages.push(...extractValidationErrors(error.children));
+      }
+    }
+    return messages;
+  };
+
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Strip properties that are not in the DTO
-      forbidNonWhitelisted: true, // Throw an error if unknown properties are provided
-      transform: true, // Automatically transform payloads to match DTO types
+      whitelist: false,
+      forbidNonWhitelisted: true,
+      transform: true,
       exceptionFactory: (errors: ValidationError[]) => {
-        const firstError = errors[0]; // Only use the first validation error
-        const message = `${firstError.property} - ${Object.values(firstError.constraints).join(', ')}`;
+        const messages = extractValidationErrors(errors);
         return new HttpException(
           {
             statusCode: HttpStatus.PRECONDITION_FAILED,
-            message,
+            message: messages[0],
           },
           HttpStatus.PRECONDITION_FAILED,
         );
