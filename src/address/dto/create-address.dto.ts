@@ -1,4 +1,4 @@
-import { IsNotEmpty, length, Length } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateAddressDto {
   id?: number;
