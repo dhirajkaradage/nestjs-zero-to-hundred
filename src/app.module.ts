@@ -8,6 +8,7 @@ import { PostsModule } from './posts/posts.module';
 import { AddressModule } from './address/address.module';
 import { Address } from './address/entities/address.entity';
 import { Post } from './posts/entities/post.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { Post } from './posts/entities/post.entity';
     }),
     PostsModule,
     AddressModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
