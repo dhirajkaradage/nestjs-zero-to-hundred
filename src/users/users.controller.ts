@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -11,7 +12,7 @@ import {
 import { UserDTO } from './userDto/user-dto';
 import { UsersService } from './users.service';
 import { Response } from 'express';
-
+import * as bcrypt from 'bcryptjs';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
@@ -33,14 +34,19 @@ export class UsersController {
     // userDTO['id'] = newId + 1;
     // this.users.push(userDTO);
     // return this.users;
+
+    const hashedPassword = await bcrypt.hash(userDTO.password, 10);
+    console.log('this is hashed password ', hashedPassword);
+    userDTO.password = hashedPassword;
     const newUser = await this.userService
       .createUser(userDTO)
       .then((res) => res);
     console.log('thsi is use ', newUser);
 
+    const { password, ...rest } = newUser;
     return res.status(201).json({
       message: 'User created successfully',
-      data: newUser,
+      data: rest,
     });
   }
 
