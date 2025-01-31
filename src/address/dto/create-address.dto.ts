@@ -14,7 +14,7 @@ export class CreateAddressDto {
 
   @IsNotEmpty({ message: 'Country is required.' })
   country: string;
-  
+
   @IsNotEmpty({ message: 'Address is required.' })
   address: string;
 }
